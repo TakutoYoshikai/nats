@@ -24,9 +24,9 @@ fn load(filename: &str) -> Vec<u8> {
     return buffer;
 }
 
-fn save(filename: &str, data: Vec<u8>) {
+fn save(filename: &str, data: &Vec<u8>) {
     let mut file = File::create(filename).unwrap();
-    file.write_all(&data).expect("failed to write");
+    file.write_all(data).expect("failed to write");
     file.flush().expect("failed to flush");
 }
 
@@ -38,10 +38,10 @@ fn last_offset() -> Vec<u8> {
     return random_bytes(135);
 }
 
-fn pack(command: Vec<u8>, data: Vec<u8>) -> Vec<u8> {
+fn pack(command: &Vec<u8>, data: &Vec<u8>) -> Vec<u8> {
     let mut result: Vec<u8> = command.clone();
     result.extend(&first_offset());
-    result.extend(&data);
+    result.extend(data);
     result.extend(&last_offset());
     return result;
 }
@@ -56,8 +56,8 @@ fn nats_in() {
     encrypter::encrypt_one_file(&args[3]);
     let command = load(&args[2]);
     let data = load(&args[3]);
-    let packed = pack(command, data);
-    save(&format!("{}.dm", args[2]), packed);
+    let packed = pack(&command, &data);
+    save(&format!("{}.dm", args[2]), &packed);
 }
 
 fn nats_out() {
@@ -69,7 +69,7 @@ fn nats_out() {
     for i in 0..len {
         out.push(src[(from + i) as usize]);
     }
-    save("nats.out", out);
+    save("nats.out", &out);
     encrypter::decrypt_one_file("nats.out", &args[4]);
 }
 fn main() {
