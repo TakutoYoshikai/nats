@@ -143,51 +143,6 @@ fn save_file(path: &str, data: &Vec<u8>) {
     }
 }
 
-fn get_files_and_dirs(dirpath: &str) -> (Vec<String>, Vec<String>) {
-    let mut files: Vec<String> = Vec::new();
-    let mut dirs: Vec<String> = Vec::new();
-    for path in fs::read_dir(dirpath).unwrap() {
-        let _path = path.unwrap().path();
-        if _path.is_dir() {
-            dirs.push(_path.display().to_string());
-        } else {
-            files.push(_path.display().to_string());
-        }
-    }
-    return (files, dirs);
-}
-
-fn encrypt_dir(dirpath: &str, key: &[u8], iv: &[u8]) {
-    let files_and_dirs = get_files_and_dirs(dirpath);
-    let files: Vec<String> = files_and_dirs.0;
-    let dirs: Vec<String> = files_and_dirs.1;
-    for file in files {
-        let data = encrypt_file(&file, &key, &iv);   
-        if data.is_none() {
-            continue;
-        }
-        save_file(&file, &data.unwrap());
-    }
-    for dir in dirs {
-        encrypt_dir(&dir, key, iv);
-    }
-}
-
-fn decrypt_dir(dirpath: &str, key: &[u8], iv: &[u8]) {
-    let files_and_dirs = get_files_and_dirs(dirpath);
-    let files: Vec<String> = files_and_dirs.0;
-    let dirs: Vec<String> = files_and_dirs.1;
-    for file in files {
-        let data = decrypt_file(&file, &key, &iv);   
-        if data.is_none() {
-            continue;
-        }
-        save_file(&file, &data.unwrap());
-    }
-    for dir in dirs {
-        decrypt_dir(&dir, key, iv);
-    }
-}
 
 fn make_key_file(key: &[u8; 32], iv: &[u8; 16]) {
     let mut data:Vec<u8> = Vec::new();
@@ -198,21 +153,6 @@ fn make_key_file(key: &[u8; 32], iv: &[u8; 16]) {
         data.push(*b);
     }
     save_file("./key", &data);
-}
-
-pub fn encrypt_and_save_key(path: &str) {
-    let mut key: [u8; 32] = [0; 32];
-    let mut iv: [u8; 16] = [0; 16];
-    let mut rng = OsRng::new().ok().unwrap();
-    rng.fill_bytes(&mut key);
-    rng.fill_bytes(&mut iv);
-    encrypt_dir(path, &key, &iv);
-    make_key_file(&key, &iv);
-}
-
-pub fn decrypt_and_load_key(dirpath: &str, keypath: &str) {
-    let (key, iv) = load_key(keypath);
-    decrypt_dir(dirpath, &key, &iv);
 }
 
 pub fn encrypt_one_file(path: &str) {

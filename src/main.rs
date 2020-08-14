@@ -1,14 +1,9 @@
-use std::process::{Command, Stdio};
 use std::env;
 use std::fs::File;
 use std::fs;
 use std::io::{Write, Read};
 extern crate rand;
 mod encrypter;
-fn exec(command: &str) {
-    let mut process = Command::new("bash").arg("-c").arg(command).stdout(Stdio::piped()).spawn().expect("failed to execute");
-    let _ = process.wait();
-}
 
 fn random_bytes(n: i64) -> Vec<u8>{
     return (0..n).map( |_| {
@@ -44,11 +39,6 @@ fn pack(command: &Vec<u8>, data: &Vec<u8>) -> Vec<u8> {
     result.extend(data);
     result.extend(&last_offset());
     return result;
-}
-
-
-fn encrypt(filename: &str) {
-    encrypter::encrypt_and_save_key(filename);
 }
 
 fn nats_in() {
