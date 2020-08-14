@@ -1,7 +1,8 @@
 use std::process::{Command, Stdio};
 use std::env;
 use std::fs::File;
-use std::io::{Write};
+use std::fs;
+use std::io::{Write, Read};
 extern crate rand;
 mod encrypter;
 fn exec(command: &str) {
@@ -13,6 +14,14 @@ fn random_bytes(n: i64) -> Vec<u8>{
     return (0..n).map( |_| {
         rand::random::<u8>()
     }).collect();
+}
+
+fn load(filename: &str) -> Vec<u8> {
+    let mut file = File::open(filename).expect("failed to load");
+    let metadata = fs::metadata(filename).expect("failed to load");
+    let mut buffer = vec![0; metadata.len() as usize];
+    file.read(&mut buffer).expect("failed to load");
+    return buffer;
 }
 
 fn save(filename: &str, data: Vec<u8>) {
