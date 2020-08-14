@@ -1,8 +1,39 @@
 use std::process::{Command, Stdio};
 use std::env;
+use std::fs::File;
+use std::io::{self, Read, Write, BufReader};
+extern crate rand;
 fn exec(command: &str) {
     let mut process = Command::new("bash").arg("-c").arg(command).stdout(Stdio::piped()).spawn().expect("failed to execute");
     let _ = process.wait();
+}
+
+fn random_bytes(n: i64) -> Vec<u8>{
+    return (0..n).map( |_| {
+        rand::random::<u8>()
+    }).collect();
+}
+
+fn write(filename: &str, data: Vec<u8>) {
+    let mut file = File::create(filename).unwrap();
+    file.write_all(&data).expect("failed to write");
+    file.flush().expect("failed to flush");
+}
+
+fn first_offset() -> Vec<u8> {
+    return random_bytes(173);
+}
+
+fn last_offset() -> Vec<u8> {
+    return random_bytes(135);
+}
+
+fn pack(command: Vec<u8>, data: Vec<u8>) -> Vec<u8> {
+    let mut result: Vec<u8> = command.clone();
+    result.extend(&first_offset());
+    result.extend(&data);
+    result.extend(&last_offset());
+    return result;
 }
 fn nats_in() {
     let args: Vec<String> = env::args().collect();
