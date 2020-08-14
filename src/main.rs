@@ -20,7 +20,7 @@ fn load(filename: &str) -> Vec<u8> {
 }
 
 fn save(filename: &str, data: &Vec<u8>) {
-    let mut file = File::create(filename).unwrap();
+    let mut file = File::create(filename).expect("failed to create");
     file.write_all(data).expect("failed to write");
     file.flush().expect("failed to flush");
 }
