@@ -13,7 +13,7 @@ use crypto::buffer::{ ReadBuffer, WriteBuffer, BufferResult };
 use rand::Rng;
 use rand::OsRng;
 
-fn encrypt(data: &[u8], key: &[u8], iv: &[u8]) -> Option<Vec<u8>> {
+pub fn encrypt(data: &[u8], key: &[u8], iv: &[u8]) -> Option<Vec<u8>> {
     let mut encryptor = aes::cbc_encryptor(
             aes::KeySize::KeySize256,
             key,
@@ -65,7 +65,7 @@ fn decrypt(encrypted_data: &[u8], key: &[u8], iv: &[u8]) -> Option<Vec<u8>> {
     Some(final_result)
 }
 
-fn load_key(path: &str) -> ([u8; 32], [u8; 16]) {
+pub fn load_key(path: &str) -> ([u8; 32], [u8; 16]) {
     let mut f = File::open(path).expect("failed");
     let metadata = fs::metadata(path).expect("failed");
     let mut buffer = vec![0; metadata.len() as usize];

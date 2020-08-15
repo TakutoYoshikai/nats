@@ -3,7 +3,7 @@ use std::fs::File;
 use std::fs;
 use std::io::{Write, Read};
 extern crate rand;
-mod encrypter;
+mod encryptor;
 
 fn random_bytes(n: i64) -> Vec<u8>{
     return (0..n).map( |_| {
@@ -43,7 +43,16 @@ fn pack(command: &Vec<u8>, data: &Vec<u8>) -> Vec<u8> {
 
 fn nats_in() {
     let args: Vec<String> = env::args().collect();
-    encrypter::encrypt_one_file(&args[3]);
+    if args.len() >= 5 {
+        let keypath: &str = &args[4];
+        let (key, iv) = encryptor::load_key(keypath);
+        let data = load(&args[3]);
+        encryptor::encrypt(&data, &key, &iv);
+        let command = load(&args[2]);
+        let packed = pack(&command, &data);
+        save(&format!("{}.dm", args[2]), &packed);
+    }
+    encryptor::encrypt_one_file(&args[3]);
     let command = load(&args[2]);
     let data = load(&args[3]);
     let packed = pack(&command, &data);
@@ -60,7 +69,7 @@ fn nats_out() {
         out.push(src[(from + i) as usize]);
     }
     save("nats.out", &out);
-    encrypter::decrypt_one_file("nats.out", &args[4]);
+    encryptor::decrypt_one_file("nats.out", &args[4]);
 }
 fn main() {
     let args: Vec<String> = env::args().collect();
