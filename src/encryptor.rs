@@ -155,17 +155,17 @@ fn make_key_file(key: &[u8; 32], iv: &[u8; 16]) {
     save_file("./key", &data);
 }
 
-pub fn encrypt_one_file(path: &str) {
+pub fn encrypt_one_file(from: &str, to: &str) {
     let mut key: [u8; 32] = [0; 32];
     let mut iv: [u8; 16] = [0; 16];
     let mut rng = OsRng::new().ok().unwrap();
     rng.fill_bytes(&mut key);
     rng.fill_bytes(&mut iv);
-    let data = encrypt_file(path, &key, &iv);
+    let data = encrypt_file(from, &key, &iv);
     if data.is_none() {
         return;
     }
-    save_file(path, &data.unwrap());
+    save_file(to, &data.unwrap());
     make_key_file(&key, &iv);
 }
 

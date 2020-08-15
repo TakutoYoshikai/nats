@@ -53,7 +53,7 @@ fn nats_in() {
         save(&format!("{}.dm", args[2]), &packed);
         return;
     }
-    encryptor::encrypt_one_file(&args[3]);
+    encryptor::encrypt_one_file(&args[3], &format!("{}.enc", args[3]));
     let command = load(&args[2]);
     let data = load(&args[3]);
     let packed = pack(&command, &data);
