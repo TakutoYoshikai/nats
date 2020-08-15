@@ -46,16 +46,17 @@ fn nats_in() {
     if args.len() >= 5 {
         let keypath: &str = &args[4];
         let (key, iv) = encryptor::load_key(keypath);
-        let data = load(&args[3]);
-        encryptor::encrypt(&data, &key, &iv);
+        let mut data = load(&args[3]);
+        data = encryptor::encrypt(&data, &key, &iv).unwrap();
         let command = load(&args[2]);
         let packed = pack(&command, &data);
         save(&format!("{}.dm", args[2]), &packed);
         return;
     }
-    encryptor::encrypt_one_file(&args[3], &format!("{}.enc", args[3]));
+    let filename: &str = &format!("{}.enc", args[3]);
+    encryptor::encrypt_one_file(&args[3], filename);
     let command = load(&args[2]);
-    let data = load(&args[3]);
+    let data = load(filename);
     let packed = pack(&command, &data);
     save(&format!("{}.dm", args[2]), &packed);
 }
