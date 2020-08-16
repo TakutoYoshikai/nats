@@ -5,7 +5,9 @@ use std::io::{Write, Read};
 extern crate rand;
 mod encryptor;
 
+//change this 
 const FIRST_OFFSET_LENGTH: i64 = 173;
+//change this 
 const LAST_OFFSET_LENGTH: i64 = 135;
 
 fn random_bytes(n: i64) -> Vec<u8>{
