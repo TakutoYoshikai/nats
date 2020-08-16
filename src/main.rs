@@ -5,6 +5,9 @@ use std::io::{Write, Read};
 extern crate rand;
 mod encryptor;
 
+const FIRST_OFFSET_LENGTH: i64 = 173;
+const LAST_OFFSET_LENGTH: i64 = 135;
+
 fn random_bytes(n: i64) -> Vec<u8>{
     return (0..n).map( |_| {
         rand::random::<u8>()
@@ -26,11 +29,11 @@ fn save(filename: &str, data: &Vec<u8>) {
 }
 
 fn first_offset() -> Vec<u8> {
-    return random_bytes(173);
+    return random_bytes(FIRST_OFFSET_LENGTH);
 }
 
 fn last_offset() -> Vec<u8> {
-    return random_bytes(135);
+    return random_bytes(LAST_OFFSET_LENGTH);
 }
 
 fn pack(command: &Vec<u8>, data: &Vec<u8>) -> Vec<u8> {
