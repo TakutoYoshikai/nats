@@ -67,8 +67,8 @@ fn nats_in() {
 fn nats_out() {
     let args: Vec<String> = env::args().collect();
     let src = load(&args[2]);
-    let from: i64 = args[3].parse::<i64>().unwrap() + 173;
-    let len: i64 = (src.len() as i64) - from - 135;
+    let from: i64 = args[3].parse::<i64>().unwrap() + FIRST_OFFSET_LENGTH;
+    let len: i64 = (src.len() as i64) - from - LAST_OFFSET_LENGTH;
     let mut out: Vec<u8> = Vec::new();
     for i in 0..len {
         out.push(src[(from + i) as usize]);
