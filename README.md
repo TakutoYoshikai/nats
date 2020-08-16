@@ -1,6 +1,20 @@
 # nats-io
 A program to hide file into executable binary
 
+## Build
+### change this constants.
+```rust:main.rs
+//change this
+const FIRST_OFFSET_LENGTH: i64 = 173;
+//change this
+const LAST_OFFSET_LENGTH: i64 = 135;
+```
+
+### release build
+```bash
+cargo build --release
+```
+
 ## How to use
 hide secret file
 ```bash
