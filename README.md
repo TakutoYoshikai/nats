@@ -26,3 +26,6 @@ extract secret file
 ```bash
 nats-io out <binary that has secret data> <size of original binary> <key>
 ```
+
+## LICENSE
+MIT LICENSE
