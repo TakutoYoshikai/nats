@@ -1,4 +1,5 @@
 # nats-io
+<img src="./nats.png" width="500">
 A program to hide file into executable binary
 
 ## Build
