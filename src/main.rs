@@ -9,9 +9,9 @@ mod encryptor;
 use serde::{Serialize, Deserialize};
 
 //change this 
-const FIRST_OFFSET_LENGTH: i64 = 173;
+const FIRST_OFFSET_LENGTH: i64 = 64;
 //change this 
-const LAST_OFFSET_LENGTH: i64 = 135;
+const LAST_OFFSET_LENGTH: i64 = 64;
 
 
 #[derive(Serialize, Deserialize, Debug)]
