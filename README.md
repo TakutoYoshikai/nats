@@ -19,13 +19,13 @@ cargo build --release
 ## How to use
 hide secret file
 ```bash
-nats-io in <binary> <secret file>
+nats-io -e -b <binary> -d <secret file>
 ```
 
 extract secret file
 
 ```bash
-nats-io out <binary that has secret data> <size of original binary> <key>
+nats-io -x -b <binary that has secret data> -s <size of original binary> -k <key>
 ```
 
 ## LICENSE
