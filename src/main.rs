@@ -1,4 +1,5 @@
 use std::env;
+use std::process;
 use std::fs::File;
 use std::fs;
 use std::io::BufReader;
@@ -7,6 +8,7 @@ use dirs;
 extern crate rand;
 mod encryptor;
 use serde::{Serialize, Deserialize};
+use getopts::Options;
 
 //change this 
 const FIRST_OFFSET_LENGTH: i64 = 64;
@@ -18,6 +20,20 @@ const LAST_OFFSET_LENGTH: i64 = 64;
 struct Config {
     first_offset_length: i64,
     last_offset_length: i64,
+}
+
+#[derive(Debug, PartialEq)]
+enum NatsMode {
+    Extract,
+    Embed,
+}
+#[derive(Debug)]
+struct Args {
+    mode: NatsMode,
+    key: Option<String>,
+    size: Option<i64>,
+    binary: String,
+    data: Option<String>,
 }
 fn config_path() -> String {
     let mut path = dirs::home_dir().unwrap();
@@ -68,45 +84,87 @@ fn pack(command: &Vec<u8>, data: &Vec<u8>, first_offset_length: i64, last_offset
     return result;
 }
 
-fn nats_in() {
-    let args: Vec<String> = env::args().collect();
+fn nats_in(binary: &str, data: &str, keypath: Option<String>) {
     let (first_offset_length, last_offset_length) = load_config();
-    if args.len() >= 5 {
-        let keypath: &str = &args[4];
+    if keypath != None {
+        let keypath: &str = &keypath.unwrap();
         let (key, iv) = encryptor::load_key(keypath);
-        let mut data = load(&args[3]);
+        let mut data = load(data);
         data = encryptor::encrypt(&data, &key, &iv).unwrap();
-        let command = load(&args[2]);
+        let command = load(binary);
         let packed = pack(&command, &data, first_offset_length, last_offset_length);
-        save(&format!("{}.dm", args[2]), &packed);
+        save(&format!("{}.dm", binary), &packed);
         return;
     }
-    let filename: &str = &format!("{}.enc", args[3]);
-    encryptor::encrypt_one_file(&args[3], filename);
-    let command = load(&args[2]);
+    let filename: &str = &format!("{}.enc", data);
+    encryptor::encrypt_one_file(data, filename);
+    let command = load(binary);
     let data = load(filename);
     let packed = pack(&command, &data, first_offset_length, last_offset_length);
-    save(&format!("{}.dm", args[2]), &packed);
+    save(&format!("{}.dm", binary), &packed);
 }
 
-fn nats_out() {
-    let args: Vec<String> = env::args().collect();
+fn nats_out(binary: &str, size: i64, key: &str) {
     let (first_offset_length, last_offset_length) = load_config();
-    let src = load(&args[2]);
-    let from: i64 = args[3].parse::<i64>().unwrap() + first_offset_length;
+    let src = load(binary);
+    let from: i64 = size + first_offset_length;
     let len: i64 = (src.len() as i64) - from - last_offset_length;
     let mut out: Vec<u8> = Vec::new();
     for i in 0..len {
         out.push(src[(from + i) as usize]);
     }
     save("nats.out", &out);
-    encryptor::decrypt_one_file("nats.out", &args[4]);
+    encryptor::decrypt_one_file("nats.out", key);
+}
+
+fn print_usage(program: &str, opts: &Options) {
+    let brief = format!("Usage: {} [options]", program);
+    print!("{}", opts.usage(&brief));
+    process::exit(0);
+}
+
+fn parse_args() -> Args {
+    let args: Vec<String> = env::args().collect();
+    let program = args[0].clone();
+    let mut opts = Options::new();
+    opts.optflag("h", "help", "help");
+    opts.optflag("x", "extract", "extract data from executable binary");
+    opts.optflag("e", "embed", "embed data into executable binary");
+    opts.optopt("k", "key", "key", "KEY");
+    opts.optopt("b", "binary", "binary", "BINARY");
+    opts.optopt("s", "size", "size", "SIZE");
+    opts.optopt("d", "data", "data", "DATA");
+    if args.len() == 1 {
+        print_usage(&program, &opts);
+    }
+    let matches = opts.parse(&args[1..]).unwrap_or_else(|f| panic!(f.to_string()));
+    if matches.opt_present("h") {
+        print_usage(&program, &opts);
+    }
+    let mut mode: NatsMode = NatsMode::Embed;
+    if matches.opt_present("x") {
+        mode = NatsMode::Extract;
+    }
+    let mut size: Option<i64> = None;
+    if mode == NatsMode::Extract {
+        size = Some(matches.opt_str("s").unwrap().parse::<i64>().expect("it needs size(number)"));
+    }
+    return Args {
+        mode: mode,
+        key: matches.opt_str("k"),
+        size: size,
+        binary: matches.opt_str("b").expect("it needs binary name"),
+        data: matches.opt_str("d"),
+    }
 }
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    if args[1] == "in" {
-        nats_in();
-    } else if args[1] == "out" {
-        nats_out();
+    let args = parse_args();
+    if args.mode == NatsMode::Extract {
+        nats_out(&args.binary, args.size.unwrap(), &args.key.unwrap());
+        return;
+    }
+    if args.mode == NatsMode::Embed {
+        nats_in(&args.binary, &args.data.unwrap(), args.key); 
+        return;
     }
 }
