@@ -151,23 +151,23 @@ fn parse_args() -> Args {
     if matches.opt_present("h") {
         print_usage(&program, &opts);
     }
-    let mut mode: NatsMode = NatsMode::Embed;
+    let mut mode: Option<NatsMode> = None;
     let mut binary: Option<String> = None;
     if matches.opt_str("x") != None {
-        mode = NatsMode::Extract;
+        mode = Some(NatsMode::Extract);
         binary = matches.opt_str("x");
     } else if matches.opt_str("e") != None {
-        mode = NatsMode::Embed;
+        mode = Some(NatsMode::Embed);
         binary = matches.opt_str("e");
     } else {
         print_usage(&program, &opts);
     }
     let mut size: Option<i64> = None;
-    if mode == NatsMode::Extract {
+    if mode == Some(NatsMode::Extract) {
         size = Some(matches.opt_str("s").unwrap().parse::<i64>().expect("it needs size(number)"));
     }
     let result: Args = Args {
-        mode: mode,
+        mode: mode.unwrap(),
         key: matches.opt_str("k"),
         size: size,
         binary: binary.unwrap(),
