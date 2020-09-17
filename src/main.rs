@@ -139,10 +139,9 @@ fn parse_args() -> Args {
     let program = args[0].clone();
     let mut opts = Options::new();
     opts.optflag("h", "help", "help");
-    opts.optflag("x", "extract", "extract data from executable binary");
-    opts.optflag("e", "embed", "embed data into executable binary");
+    opts.optopt("x", "extract", "extract data from executable binary", "BINARY");
+    opts.optopt("e", "embed", "embed data into executable binary", "BINARY");
     opts.optopt("k", "key", "key", "KEY");
-    opts.optopt("b", "binary", "binary", "BINARY");
     opts.optopt("s", "size", "size", "SIZE");
     opts.optopt("d", "data", "data", "DATA");
     if args.len() == 1 {
@@ -153,8 +152,15 @@ fn parse_args() -> Args {
         print_usage(&program, &opts);
     }
     let mut mode: NatsMode = NatsMode::Embed;
-    if matches.opt_present("x") {
+    let mut binary: Option<String> = None;
+    if matches.opt_str("x") != None {
         mode = NatsMode::Extract;
+        binary = matches.opt_str("x");
+    } else if matches.opt_str("e") != None {
+        mode = NatsMode::Embed;
+        binary = matches.opt_str("e");
+    } else {
+        print_usage(&program, &opts);
     }
     let mut size: Option<i64> = None;
     if mode == NatsMode::Extract {
@@ -164,7 +170,7 @@ fn parse_args() -> Args {
         mode: mode,
         key: matches.opt_str("k"),
         size: size,
-        binary: matches.opt_str("b").expect("it needs binary name"),
+        binary: binary.unwrap(),
         data: matches.opt_str("d"),
     };
     if !validate_args(&result) {
