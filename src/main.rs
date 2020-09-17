@@ -180,12 +180,8 @@ fn parse_args() -> Args {
 }
 fn main() {
     let args = parse_args();
-    if args.mode == NatsMode::Extract {
-        extract(&args.binary, args.size.unwrap(), &args.key.unwrap());
-        return;
-    }
-    if args.mode == NatsMode::Embed {
-        embed(&args.binary, &args.data.unwrap(), args.key); 
-        return;
+    match args.mode {
+        NatsMode::Extract => extract(&args.binary, args.size.unwrap(), &args.key.unwrap()),
+        NatsMode::Embed => embed(&args.binary, &args.data.unwrap(), args.key),
     }
 }
