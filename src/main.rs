@@ -124,13 +124,9 @@ fn print_usage(program: &str, opts: &Options) {
 }
 
 fn validate_args(args: &Args) -> bool {
-    match args.mode {
-        NatsMode::Extract => {
-            return args.size != None && args.key != None;
-        },
-        NatsMode::Embed => {
-            return args.data != None;
-        }
+    return match args.mode {
+        NatsMode::Extract => args.size != None && args.key != None,
+        NatsMode::Embed => args.data != None,
     }
 }
 
