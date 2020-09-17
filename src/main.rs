@@ -84,7 +84,7 @@ fn pack(command: &Vec<u8>, data: &Vec<u8>, first_offset_length: i64, last_offset
     return result;
 }
 
-fn nats_in(binary: &str, data: &str, keypath: Option<String>) {
+fn embed(binary: &str, data: &str, keypath: Option<String>) {
     let (first_offset_length, last_offset_length) = load_config();
     if keypath != None {
         let keypath: &str = &keypath.unwrap();
@@ -104,7 +104,7 @@ fn nats_in(binary: &str, data: &str, keypath: Option<String>) {
     save(&format!("{}.dm", binary), &packed);
 }
 
-fn nats_out(binary: &str, size: i64, key: &str) {
+fn extract(binary: &str, size: i64, key: &str) {
     let (first_offset_length, last_offset_length) = load_config();
     let src = load(binary);
     let from: i64 = size + first_offset_length;
@@ -181,11 +181,11 @@ fn parse_args() -> Args {
 fn main() {
     let args = parse_args();
     if args.mode == NatsMode::Extract {
-        nats_out(&args.binary, args.size.unwrap(), &args.key.unwrap());
+        extract(&args.binary, args.size.unwrap(), &args.key.unwrap());
         return;
     }
     if args.mode == NatsMode::Embed {
-        nats_in(&args.binary, &args.data.unwrap(), args.key); 
+        embed(&args.binary, &args.data.unwrap(), args.key); 
         return;
     }
 }
