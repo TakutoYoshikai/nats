@@ -123,6 +123,17 @@ fn print_usage(program: &str, opts: &Options) {
     process::exit(0);
 }
 
+fn validate_args(args: &Args) -> bool {
+    match args.mode {
+        NatsMode::Extract => {
+            return args.size != None && args.key != None;
+        },
+        NatsMode::Embed => {
+            return args.data != None;
+        }
+    }
+}
+
 fn parse_args() -> Args {
     let args: Vec<String> = env::args().collect();
     let program = args[0].clone();
@@ -149,13 +160,17 @@ fn parse_args() -> Args {
     if mode == NatsMode::Extract {
         size = Some(matches.opt_str("s").unwrap().parse::<i64>().expect("it needs size(number)"));
     }
-    return Args {
+    let result: Args = Args {
         mode: mode,
         key: matches.opt_str("k"),
         size: size,
         binary: matches.opt_str("b").expect("it needs binary name"),
         data: matches.opt_str("d"),
+    };
+    if !validate_args(&result) {
+        print_usage(&program, &opts);
     }
+    return result;
 }
 fn main() {
     let args = parse_args();

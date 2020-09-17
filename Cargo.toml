@@ -1,5 +1,5 @@
 [package]
-name = "nats-io"
+name = "nats"
 version = "0.1.0"
 authors = ["takuto <takuto.yoshikai@gmail.com>"]
 edition = "2018"
