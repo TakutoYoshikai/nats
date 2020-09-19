@@ -96,10 +96,10 @@ fn embed(binary: &str, data: &str, keypath: Option<String>) {
         save(&format!("{}.dm", binary), &packed);
         return;
     }
-    let filename: &str = &format!("{}.enc", data);
-    encryptor::encrypt_one_file(data, filename);
+    let data = load(data);
+    let (key, iv) = encryptor::make_key();
+    let data = encryptor::encrypt(&data, &key, &iv).unwrap();
     let command = load(binary);
-    let data = load(filename);
     let packed = pack(&command, &data, first_offset_length, last_offset_length);
     save(&format!("{}.dm", binary), &packed);
 }

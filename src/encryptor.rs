@@ -82,27 +82,6 @@ pub fn load_key(path: &str) -> ([u8; 32], [u8; 16]) {
     return (key, iv);
 }
 
-fn encrypt_file(path: &str, key: &[u8], iv: &[u8]) -> Option<Vec<u8>>{
-    let f = File::open(path);
-    match f {
-        Ok(_) => (),
-        Err(_) => return None,
-    }
-    let mut f = f.unwrap();
-    let metadata = fs::metadata(path);
-    match metadata {
-        Ok(_) => (),
-        Err(_) => return None,
-    }
-    let metadata = metadata.unwrap();
-    let mut buffer = vec![0; metadata.len() as usize];
-    match f.read(&mut buffer) {
-        Ok(_) => (),
-        Err(_) => return None,
-    }
-    let encrypted_data = encrypt(&buffer, &key, &iv);
-    return encrypted_data;
-}
 
 fn decrypt_file(path: &str, key: &[u8], iv: &[u8]) -> Option<Vec<u8>>{
     let f = File::open(path);
@@ -143,6 +122,15 @@ fn save_file(path: &str, data: &Vec<u8>) {
     }
 }
 
+pub fn make_key() -> ([u8; 32], [u8; 16]) {
+    let mut key: [u8; 32] = [0; 32];
+    let mut iv: [u8; 16] = [0; 16];
+    let mut rng = OsRng::new().ok().unwrap();
+    rng.fill_bytes(&mut key);
+    rng.fill_bytes(&mut iv);
+    make_key_file(&key, &iv);
+    return (key, iv);
+}
 
 fn make_key_file(key: &[u8; 32], iv: &[u8; 16]) {
     let mut data:Vec<u8> = Vec::new();
@@ -155,19 +143,6 @@ fn make_key_file(key: &[u8; 32], iv: &[u8; 16]) {
     save_file("./key", &data);
 }
 
-pub fn encrypt_one_file(from: &str, to: &str) {
-    let mut key: [u8; 32] = [0; 32];
-    let mut iv: [u8; 16] = [0; 16];
-    let mut rng = OsRng::new().ok().unwrap();
-    rng.fill_bytes(&mut key);
-    rng.fill_bytes(&mut iv);
-    let data = encrypt_file(from, &key, &iv);
-    if data.is_none() {
-        return;
-    }
-    save_file(to, &data.unwrap());
-    make_key_file(&key, &iv);
-}
 
 pub fn decrypt_one_file(path: &str, keypath: &str) {
     let (key, iv) = load_key(keypath);
