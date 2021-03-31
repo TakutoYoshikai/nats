@@ -2,6 +2,11 @@
 <img src="./nats.png" width="500">
 A program to hide file into executable binary
 
+## Install
+```bash
+cargo install --git https://github.com/TakutoYoshikai/nats.git
+```
+
 ## Build
 ### change this constants.
 ```rust:main.rs
@@ -19,13 +24,13 @@ cargo build --release
 ## How to use
 hide secret file
 ```bash
-nats-io -e -b <binary> -d <secret file>
+nats -e -b <binary> -d <secret file>
 ```
 
 extract secret file
 
 ```bash
-nats-io -x -b <binary that has secret data> -s <size of original binary> -k <key>
+nats -x -b <binary that has secret data> -s <size of original binary> -k <key>
 ```
 
 ## LICENSE
