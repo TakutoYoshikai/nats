@@ -3,6 +3,7 @@
 A program to hide file into executable binary
 
 ## Install
+You can install nats quickly by below command. You can build nats by myself to customize parameters if you want to improve the security.
 ```bash
 cargo install --git https://github.com/TakutoYoshikai/nats.git
 ```
@@ -14,11 +15,6 @@ cargo install --git https://github.com/TakutoYoshikai/nats.git
 const FIRST_OFFSET_LENGTH: i64 = 173;
 //change this
 const LAST_OFFSET_LENGTH: i64 = 135;
-```
-
-### release build
-```bash
-cargo build --release
 ```
 
 ## How to use
