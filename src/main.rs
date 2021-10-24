@@ -143,7 +143,7 @@ fn parse_args() -> Args {
     if args.len() == 1 {
         print_usage(&program, &opts);
     }
-    let matches = opts.parse(&args[1..]).unwrap_or_else(|f| panic!(f.to_string()));
+    let matches = opts.parse(&args[1..]).unwrap_or_else(|f| panic!("{}", f.to_string()));
     if matches.opt_present("h") {
         print_usage(&program, &opts);
     }
