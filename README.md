@@ -21,13 +21,15 @@ const LAST_OFFSET_LENGTH: i64 = 135;
 ## How to use
 hide secret file
 ```bash
-nats -e -b <binary> -d <secret file>
+nats -e <binary> -d <secret file> -k <key file(optional)>
+# It generates ./<binary>.dm file.
+# It generates ./key if key file is not given.
 ```
 
 extract secret file
 
 ```bash
-nats -x -b <binary that has secret data> -s <size of original binary> -k <key>
+nats -x <binary that has secret data> -s <size of original binary> -k <key file> -s <original binary size(bytes)>
 ```
 
 ## LICENSE
