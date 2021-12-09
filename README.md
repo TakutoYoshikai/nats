@@ -2,6 +2,11 @@
 <img src="./nats.png" width="500">
 A program to hide file into executable binary
 
+## Requirements
+* macOS or Ubuntu (Windows is not checked yet).
+* Cargo
+* Rust
+
 ## Install
 You can install nats quickly by below command. 
 ```bash
